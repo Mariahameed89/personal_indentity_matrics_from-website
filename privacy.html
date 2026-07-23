@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — PipelineFlow (demo)</title>
+  <meta name="description" content="Privacy policy for the PipelineFlow demo site used to test the Leadpipe visitor-identification pixel." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .legal { padding: 2.5rem 0 4rem; }
+    .legal .container { max-width: 760px; }
+    .legal h1 { margin-bottom: .3rem; }
+    .legal h2 { font-size: 1.3rem; margin-top: 2rem; }
+    .legal p, .legal li { color: var(--muted); }
+    .legal ul { padding-left: 1.2rem; display: grid; gap: .4rem; }
+    .legal .updated { font-size: .85rem; }
+    .callout {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.2rem; margin: 1.4rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">PipelineFlow</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <a class="btn btn--primary nav__cta" href="index.html#contact">Book a Demo</a>
+    </div>
+  </header>
+
+  <main class="legal">
+    <div class="container">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: 24 July 2026</p>
+
+      <div class="callout">
+        <strong>Demo disclaimer.</strong> PipelineFlow is a <em>fictional</em> company and this
+        site exists only to test a third-party visitor-identification pixel (Leadpipe).
+        No products or services are actually sold here.
+      </div>
+
+      <h2>1. What this site does</h2>
+      <p>
+        This page loads a third-party analytics pixel provided by <strong>Leadpipe</strong>.
+        When enabled, Leadpipe attempts to identify the business/organization associated
+        with a visit (for example, based on network information). We use this only to test
+        whether the pixel functions.
+      </p>
+
+      <h2>2. Consent comes first</h2>
+      <p>
+        The Leadpipe pixel is <strong>not loaded</strong> until you click <strong>Accept</strong>
+        on the cookie banner. If you click <strong>Reject</strong>, the pixel is never loaded.
+        Your choice is stored in your browser's <code>localStorage</code> under the key
+        <code>pf_consent</code>. You can revoke it at any time using the
+        <strong>Reset consent</strong> button in the footer.
+      </p>
+
+      <h2>3. What may be collected (when you accept)</h2>
+      <ul>
+        <li>Standard request metadata such as IP address and user agent (by Leadpipe).</li>
+        <li>Pages viewed on this site and basic interaction events used for the test.</li>
+        <li>Any details you voluntarily type into the demo contact form.</li>
+      </ul>
+      <p>
+        The demo contact form does <strong>not</strong> send data to any server of ours — submissions
+        are handled entirely in your browser to show a thank-you message.
+      </p>
+
+      <h2>4. Third-party processing</h2>
+      <p>
+        Leadpipe processes visit data on its own infrastructure under its own policies.
+        Review Leadpipe's documentation and privacy terms at
+        <a href="https://dashboard.leadpipe.com/dashboard/pixels" rel="noopener" target="_blank">their dashboard</a>
+        for details on how identification works and how to exercise data rights.
+      </p>
+
+      <h2>5. Cookies &amp; local storage</h2>
+      <ul>
+        <li><code>pf_consent</code> — your Accept/Reject choice (first-party, localStorage).</li>
+        <li>Any cookies set by the Leadpipe script itself, only after you accept.</li>
+      </ul>
+
+      <h2>6. Your choices</h2>
+      <ul>
+        <li>Click <strong>Reject</strong> to prevent the pixel from loading.</li>
+        <li>Use <strong>Reset consent</strong> (footer) to clear your choice and be asked again.</li>
+        <li>Use your browser or an ad/tracker blocker to block third-party scripts.</li>
+      </ul>
+
+      <h2>7. Contact</h2>
+      <p>
+        This is a demo project. For questions about the test, contact the site operator who
+        deployed it. For questions about Leadpipe's processing, contact Leadpipe directly.
+      </p>
+
+      <p style="margin-top:2rem;"><a href="index.html">← Back to PipelineFlow</a></p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__legal">
+      <p>© <span id="year"></span> PipelineFlow (demo). Not a real company.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

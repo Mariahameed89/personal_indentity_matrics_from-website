@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PipelineFlow — Revenue automation for modern B2B teams</title>
+  <meta name="description" content="PipelineFlow is a fictional B2B SaaS demo used to test the Leadpipe visitor-identification pixel." />
+
+  <!--
+    ============================================================
+    LEADPIPE PIXEL START
+    ------------------------------------------------------------
+    The Leadpipe pixel is intentionally NOT hard-coded here.
+    To respect the cookie-consent banner, the pixel is injected
+    dynamically from script.js ONLY after the visitor clicks
+    "Accept". This is the recommended <head> location, so the
+    loader below is invoked as early as possible once consent
+    exists in localStorage.
+
+    The exact, unmodified pixel that gets injected is:
+
+    <script src="https://leadpipe.aws53.cloud/p/c801e1ba-dfe5-4c5e-b34a-ce2c53bd990b.js" async></script>
+
+    To swap in a new pixel, edit LEADPIPE_PIXEL_SRC at the top of
+    script.js — do not modify the script string above.
+    LEADPIPE PIXEL END
+    ============================================================
+  -->
+
+  <link rel="preconnect" href="https://leadpipe.aws53.cloud" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ============ NAVIGATION ============ -->
+  <header class="nav" id="top">
+    <div class="container nav__inner">
+      <a class="brand" href="#top" aria-label="PipelineFlow home">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">PipelineFlow</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
+
+      <a class="btn btn--primary nav__cta" href="#contact" data-demo-cta>Book a Demo</a>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow">Revenue automation platform</p>
+          <h1>Turn anonymous traffic into a predictable pipeline.</h1>
+          <p class="lead">
+            PipelineFlow unifies your website signals, CRM, and outreach so your
+            revenue team spends less time guessing and more time closing.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary btn--lg" href="#contact" data-demo-cta>Book a Demo</a>
+            <a class="btn btn--ghost btn--lg" href="#features">See how it works</a>
+          </div>
+          <p class="hero__note">No credit card required · 14-day trial · Cancel anytime</p>
+        </div>
+
+        <div class="hero__panel" aria-hidden="true">
+          <div class="stat-card">
+            <span class="stat-card__label">Pipeline this quarter</span>
+            <span class="stat-card__value">$1.28M</span>
+            <span class="stat-card__delta">▲ 24% vs last quarter</span>
+          </div>
+          <div class="stat-row">
+            <div class="mini"><span>Visitors</span><strong>18,204</strong></div>
+            <div class="mini"><span>Identified</span><strong>3,910</strong></div>
+            <div class="mini"><span>Meetings</span><strong>142</strong></div>
+          </div>
+          <div class="bars">
+            <span style="height:38%"></span><span style="height:56%"></span>
+            <span style="height:44%"></span><span style="height:72%"></span>
+            <span style="height:61%"></span><span style="height:88%"></span>
+            <span style="height:70%"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LOGOS ============ -->
+    <section class="logos">
+      <div class="container">
+        <p class="logos__label">Trusted by fast-growing teams (illustrative)</p>
+        <div class="logos__row">
+          <span>Northwind</span><span>Acme Cloud</span><span>Contoso</span>
+          <span>Globex</span><span>Initech</span><span>Umbrella</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Features</p>
+          <h2>Everything you need to run pipeline on autopilot</h2>
+          <p class="section-sub">A single workspace for signals, scoring, and outreach.</p>
+        </div>
+
+        <div class="grid grid--3">
+          <article class="card feature">
+            <div class="feature__icon" aria-hidden="true">◆</div>
+            <h3>Visitor signals</h3>
+            <p>Capture intent from every page view and surface the accounts most likely to buy.</p>
+          </article>
+          <article class="card feature">
+            <div class="feature__icon" aria-hidden="true">◈</div>
+            <h3>Smart scoring</h3>
+            <p>Blend firmographic and behavioral data into a single, explainable lead score.</p>
+          </article>
+          <article class="card feature">
+            <div class="feature__icon" aria-hidden="true">◇</div>
+            <h3>Automated routing</h3>
+            <p>Send the right lead to the right rep instantly with rules your team controls.</p>
+          </article>
+          <article class="card feature">
+            <div class="feature__icon" aria-hidden="true">❖</div>
+            <h3>CRM sync</h3>
+            <p>Two-way sync with your CRM keeps every record clean and up to date.</p>
+          </article>
+          <article class="card feature">
+            <div class="feature__icon" aria-hidden="true">✦</div>
+            <h3>Sequences</h3>
+            <p>Trigger multi-step outreach the moment a target account shows real intent.</p>
+          </article>
+          <article class="card feature">
+            <div class="feature__icon" aria-hidden="true">✧</div>
+            <h3>Reporting</h3>
+            <p>Dashboards that tie pipeline back to the sources and campaigns that created it.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section class="pricing" id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Pricing</p>
+          <h2>Simple plans that scale with you</h2>
+          <p class="section-sub">All plans include unlimited seats. Prices are illustrative.</p>
+        </div>
+
+        <div class="grid grid--3 pricing__grid">
+          <article class="card price">
+            <h3 class="price__name">Starter</h3>
+            <p class="price__amount">$49<span>/mo</span></p>
+            <ul class="price__list">
+              <li>Up to 2,500 identified visitors</li>
+              <li>Lead scoring</li>
+              <li>Email support</li>
+            </ul>
+            <a class="btn btn--ghost btn--block" href="#contact" data-demo-cta>Start trial</a>
+          </article>
+
+          <article class="card price price--featured">
+            <span class="price__badge">Most popular</span>
+            <h3 class="price__name">Growth</h3>
+            <p class="price__amount">$149<span>/mo</span></p>
+            <ul class="price__list">
+              <li>Up to 25,000 identified visitors</li>
+              <li>Automated routing &amp; sequences</li>
+              <li>CRM sync</li>
+              <li>Priority support</li>
+            </ul>
+            <a class="btn btn--primary btn--block" href="#contact" data-demo-cta>Book a Demo</a>
+          </article>
+
+          <article class="card price">
+            <h3 class="price__name">Enterprise</h3>
+            <p class="price__amount">Custom</p>
+            <ul class="price__list">
+              <li>Unlimited identified visitors</li>
+              <li>SSO &amp; advanced security</li>
+              <li>Dedicated success manager</li>
+            </ul>
+            <a class="btn btn--ghost btn--block" href="#contact" data-demo-cta>Talk to sales</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT / BOOK A DEMO ============ -->
+    <section class="contact" id="contact">
+      <div class="container contact__inner">
+        <div class="contact__copy">
+          <p class="eyebrow">Book a Demo</p>
+          <h2>See PipelineFlow on your data</h2>
+          <p class="section-sub">
+            Tell us a little about your team and we'll put together a tailored walkthrough.
+          </p>
+          <ul class="contact__points">
+            <li>30-minute personalized demo</li>
+            <li>Answers to your technical questions</li>
+            <li>A tailored ROI estimate</li>
+          </ul>
+        </div>
+
+        <div class="card contact__card">
+          <!-- Thank-you message (hidden until submit) -->
+          <div class="thankyou" id="thankyou" hidden>
+            <div class="thankyou__check" aria-hidden="true">✓</div>
+            <h3>Thanks — we got it!</h3>
+            <p>Your request has been received. A member of our team will reach out shortly.</p>
+            <button class="btn btn--ghost" id="resetForm" type="button">Submit another response</button>
+          </div>
+
+          <form class="form" id="demoForm" novalidate>
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required placeholder="Jane Doe" />
+            </div>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required placeholder="jane@company.com" />
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization" required placeholder="Company Inc." />
+            </div>
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="4" placeholder="What are you hoping to solve?"></textarea>
+            </div>
+            <p class="form__error" id="formError" hidden></p>
+            <button class="btn btn--primary btn--block btn--lg" type="submit">Book a Demo</button>
+            <p class="form__fine">
+              By submitting you agree to our <a href="privacy.html">privacy policy</a>.
+              This is a demo — no data is sent to a server.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">PipelineFlow</span>
+        <p class="footer__tag">Revenue automation for modern B2B teams. (Fictional demo site.)</p>
+      </div>
+      <nav class="footer__links" aria-label="Footer">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+        <a href="privacy.html">Privacy policy</a>
+      </nav>
+      <div class="footer__consent">
+        <span class="footer__consent-status" id="footerConsent">Consent: unknown</span>
+        <button class="btn btn--ghost btn--sm" id="resetConsent" type="button">Reset consent</button>
+      </div>
+    </div>
+    <div class="container footer__legal">
+      <p>© <span id="year"></span> PipelineFlow (demo). Not a real company.</p>
+    </div>
+  </footer>
+
+  <!-- ============ COOKIE CONSENT BANNER ============ -->
+  <div class="cookie" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Cookie consent" hidden>
+    <div class="cookie__inner">
+      <div class="cookie__text">
+        <strong>We use analytics cookies</strong>
+        <p>
+          We'd like to load the Leadpipe visitor-identification pixel to understand who
+          visits our site. It only loads if you accept. See our
+          <a href="privacy.html">privacy policy</a>.
+        </p>
+      </div>
+      <div class="cookie__actions">
+        <button class="btn btn--ghost" id="rejectCookies" type="button">Reject</button>
+        <button class="btn btn--primary" id="acceptCookies" type="button">Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DEBUG PANEL (only with ?debug=true) ============ -->
+  <aside class="debug" id="debugPanel" hidden aria-label="Debug panel">
+    <div class="debug__head">
+      <strong>🔧 Leadpipe test panel</strong>
+      <button class="debug__close" id="debugClose" aria-label="Close debug panel">×</button>
+    </div>
+    <dl class="debug__grid">
+      <dt>Page URL</dt><dd id="dbgUrl">—</dd>
+      <dt>Consent</dt><dd id="dbgConsent">—</dd>
+      <dt>Pixel loaded</dt><dd id="dbgPixel">—</dd>
+      <dt>Timestamp</dt><dd id="dbgTime">—</dd>
+      <dt>User agent</dt><dd id="dbgUa">—</dd>
+      <dt>Referrer</dt><dd id="dbgRef">—</dd>
+    </dl>
+    <div class="debug__actions">
+      <button class="btn btn--ghost btn--sm" id="dbgPageView" type="button">Test page-view event</button>
+      <button class="btn btn--ghost btn--sm" id="dbgLead" type="button">Test lead event</button>
+      <button class="btn btn--ghost btn--sm" id="dbgClear" type="button">Clear consent &amp; reload</button>
+    </div>
+    <p class="debug__log" id="dbgLog">Ready.</p>
+  </aside>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
