@@ -8,26 +8,43 @@
 
   <!--
     ============================================================
-    LEADPIPE PIXEL START
+    VISITOR-IDENTIFICATION PIXELS
     ------------------------------------------------------------
-    The Leadpipe pixel is intentionally NOT hard-coded here.
-    To respect the cookie-consent banner, the pixel is injected
+    NONE of these are hard-coded as live <script> tags here. To
+    respect the cookie-consent banner, every tracker is injected
     dynamically from script.js ONLY after the visitor clicks
-    "Accept". This is the recommended <head> location, so the
-    loader below is invoked as early as possible once consent
-    exists in localStorage.
+    "Accept" (see loadAllTrackers). This <head> block is the
+    reference/documentation for what gets injected.
 
-    The exact, unmodified pixel that gets injected is:
+    ---- VISILEAD PIXEL START  [ACTIVE] ----
+    Registered for websitetracking-five.vercel.app.
+    Tracking ID: vl_a35bbeff8ef6
+    Injected using VisiLead's manual-consent mode, so it stores
+    and tracks nothing until visilead.consent() is called — which
+    we do only after Accept. visilead.revokeConsent() is called on
+    Reject / Reset consent.
+
+    <script src="https://visilead.co/tracker.js" data-id="vl_a35bbeff8ef6" data-consent="manual" defer></script>
+    ---- VISILEAD PIXEL END ----
+
+    ---- LEADPIPE PIXEL START  [DISABLED] ----
+    The pixel below is tied to a DIFFERENT expected domain, so it
+    cannot verify on this URL. To enable: generate a Leadpipe pixel
+    for THIS domain, then set LEADPIPE.enabled = true and update
+    LEADPIPE.src in script.js.
 
     <script src="https://leadpipe.aws53.cloud/p/c801e1ba-dfe5-4c5e-b34a-ce2c53bd990b.js" async></script>
+    ---- LEADPIPE PIXEL END ----
 
-    To swap in a new pixel, edit LEADPIPE_PIXEL_SRC at the top of
-    script.js — do not modify the script string above.
-    LEADPIPE PIXEL END
+    ---- WARMLY PIXEL START  [PENDING] ----
+    Awaiting the Warmly.ai token. It will slot in here and load
+    under the same consent gate (WARMLY config in script.js).
+    ---- WARMLY PIXEL END ----
     ============================================================
   -->
 
-  <link rel="preconnect" href="https://leadpipe.aws53.cloud" />
+  <!-- No preconnect to the Leadpipe host: we make ZERO network contact with
+       Leadpipe until the visitor clicks "Accept". Keeps the consent gate airtight. -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -280,9 +297,9 @@
       <div class="cookie__text">
         <strong>We use analytics cookies</strong>
         <p>
-          We'd like to load the Leadpipe visitor-identification pixel to understand who
-          visits our site. It only loads if you accept. See our
-          <a href="privacy.html">privacy policy</a>.
+          With your consent we load a visitor-identification tool (VisiLead) to understand
+          which businesses visit our site. Nothing loads or tracks until you accept, and you
+          can withdraw at any time. See our <a href="privacy.html">privacy policy</a>.
         </p>
       </div>
       <div class="cookie__actions">
@@ -301,7 +318,7 @@
     <dl class="debug__grid">
       <dt>Page URL</dt><dd id="dbgUrl">—</dd>
       <dt>Consent</dt><dd id="dbgConsent">—</dd>
-      <dt>Pixel loaded</dt><dd id="dbgPixel">—</dd>
+      <dt>Trackers</dt><dd id="dbgPixel">—</dd>
       <dt>Timestamp</dt><dd id="dbgTime">—</dd>
       <dt>User agent</dt><dd id="dbgUa">—</dd>
       <dt>Referrer</dt><dd id="dbgRef">—</dd>

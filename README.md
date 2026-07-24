@@ -1,10 +1,13 @@
-# PipelineFlow — Leadpipe pixel test site
+# PipelineFlow — visitor-identification pixel test site
 
 A small, production-ready **static** website (plain HTML / CSS / JS) whose only
-purpose is to test whether the **Leadpipe** visitor-identification pixel works.
+purpose is to test whether visitor-identification pixels (**VisiLead**, and later
+Leadpipe / Warmly.ai) actually detect and identify visitors.
+
+**Live:** https://websitetracking-five.vercel.app
 
 It presents a fictional B2B SaaS landing page called **PipelineFlow** and loads
-the Leadpipe pixel **only after the visitor accepts analytics cookies**.
+its tracking pixels **only after the visitor accepts analytics cookies**.
 
 > ⚠️ This is a technical test harness, not a real product. PipelineFlow is fictional.
 
@@ -26,40 +29,44 @@ No frameworks, no database, no backend, no build step.
 
 ---
 
-## How the pixel is loaded (important)
+## Trackers & how they load (important)
 
-The Leadpipe script is **not** hard-coded as a normal `<script>` tag, because that
-would load it before consent. Instead:
+| Provider | Status | Notes |
+|----------|--------|-------|
+| **VisiLead** | ✅ Active | ID `vl_a35bbeff8ef6`, registered for `websitetracking-five.vercel.app` |
+| **Leadpipe** | ⏸ Disabled | Existing pixel is tied to a *different* expected domain, so it can't verify here |
+| **Warmly.ai** | ⏳ Pending | Awaiting token — will slot into the same consent gate |
 
-1. `index.html` contains a clearly marked, commented reference block:
-   ```html
-   <!-- LEADPIPE PIXEL START -->
-   ...exact script string, for reference only...
-   <!-- LEADPIPE PIXEL END -->
-   ```
-2. The real pixel is injected by `script.js` **only after "Accept"**, and **only once**
-   (guarded by an in-memory flag + a DOM id check, so it never double-loads).
+No tracker is hard-coded as a live `<script>` tag, because that would load it before
+consent. Instead:
 
-**To swap in a new pixel:** edit `LEADPIPE_PIXEL_SRC` at the top of `script.js`.
-Do not modify the script string itself — only the URL.
+1. `index.html` contains a clearly marked, **commented** reference block
+   (`VISILEAD PIXEL START/END`, `LEADPIPE PIXEL START/END`, `WARMLY PIXEL START/END`).
+   These are documentation only — the browser never executes them.
+2. The real scripts are injected by `script.js` **only after "Accept"**, and **only once
+   each** (guarded by an in-memory flag + a DOM id check, so they never double-load).
 
-Current pixel:
-```
-https://leadpipe.aws53.cloud/p/c801e1ba-dfe5-4c5e-b34a-ce2c53bd990b.js
-```
+**To add or swap a tracker:** edit the config objects at the top of `script.js`
+(`VISILEAD`, `LEADPIPE`, `WARMLY`) — set `src`, `id`, and `enabled`. Nothing else changes.
+
+### VisiLead consent mode
+VisiLead is injected with `data-consent="manual"`, so it stores and tracks **nothing**
+until `visilead.consent()` is called — which happens only after Accept. It also honours
+the browser's GPC opt-out signal automatically.
 
 ### Consent behaviour
-- **Accept** → saves `pf_consent=accepted` in `localStorage`, injects the pixel,
-  logs `Leadpipe pixel loaded` in the console.
-- **Reject** → saves `pf_consent=rejected`, does **not** load the pixel,
-  logs `Leadpipe tracking rejected` in the console.
-- **Reset consent** (footer button) → clears the choice and reloads so you can retest.
+- **Accept** → saves `pf_consent=accepted`, injects enabled trackers, calls
+  `visilead.consent()`, logs `VisiLead pixel loaded — consent granted`.
+- **Reject** → saves `pf_consent=rejected`, loads **nothing**, logs
+  `Tracking rejected — no visitor-identification pixel loaded`.
+- **Reset consent** (footer) → calls `visilead.revokeConsent()` (stops tracking and
+  deletes the visitor ID from the browser), clears the choice, and reloads.
 
 ### Custom events
-Leadpipe does not publish a documented browser custom-event API at the time of writing.
-`script.js` therefore **probes** for common integration shapes (`window.leadpipe.track`,
-a push queue, or a `dataLayer` fallback) and logs what it did. It never fabricates a
-successful send. Events are only attempted when consent is `accepted`.
+VisiLead documents `consent()` and `revokeConsent()`, but no public custom-event API.
+`script.js` therefore **probes** for a `.track()` method on any loaded provider and
+otherwise falls back to a `dataLayer` queue, logging exactly what it did. It never
+fabricates a successful send. Events only fire when consent is `accepted`.
 
 ---
 
@@ -77,7 +84,7 @@ npx serve .
 
 Then open <http://localhost:8080>.
 
-> Note: Leadpipe generally will **not** identify localhost traffic — deploy publicly to test properly.
+> Note: these tools generally will **not** identify localhost traffic — deploy publicly to test properly.
 
 ### Debug panel
 Append `?debug=true` to any URL, e.g. `http://localhost:8080/?debug=true`.
@@ -112,40 +119,49 @@ Run these in the browser after deploying (open DevTools → Console + Network):
 - [ ] No JavaScript errors in the console on load.
 - [ ] Site looks correct on **mobile and desktop** (resize / use device toolbar).
 - [ ] Cookie banner appears on first visit (incognito).
-- [ ] After **Accept**: console shows `Leadpipe pixel loaded`; Network shows the pixel `.js` request.
-- [ ] After **Reject**: console shows `Leadpipe tracking rejected`; **no** pixel request in Network.
-- [ ] Pixel loads **only once** (reload with consent already accepted → still a single pixel `<script id="leadpipe-pixel">`).
-- [ ] `?debug=true` panel shows correct URL, consent, pixel status, timestamp, UA, referrer.
+- [ ] **Before** choosing: Network shows **zero** requests to `visilead.co`.
+- [ ] After **Accept**: console shows `VisiLead pixel loaded — consent granted`; Network shows `tracker.js`.
+- [ ] After **Reject**: console shows `Tracking rejected …`; **no** request to `visilead.co`.
+- [ ] Loads **only once** (reload with consent accepted → still a single `<script id="visilead-pixel">`).
+- [ ] **Reset consent** → console shows `VisiLead consent revoked — visitor ID deleted from browser`.
+- [ ] `?debug=true` panel shows correct URL, consent, tracker status, timestamp, UA, referrer.
 - [ ] Contact form: submitting shows the thank-you message and does not navigate away.
 - [ ] All pages load as static files (index + privacy) with no server needed.
 
 ---
 
-## 🧪 Live Leadpipe test checklist
+## 🧪 Live test checklist
 
-1. **Deploy the website publicly** (Netlify / Vercel / GitHub Pages) so it has a real domain.
-2. **Add the deployed domain to Leadpipe** if domain approval/verification is required
-   (see <https://dashboard.leadpipe.com/dashboard/pixels>).
+Live site: **https://websitetracking-five.vercel.app**
+
+1. **Site is deployed publicly** on Vercel — done.
+2. **Domain is registered in VisiLead** (`websitetracking-five.vercel.app`) — done, status *Pending*.
 3. **Open the deployed site in an incognito window.**
-4. **Accept** the tracking consent so the pixel loads.
-5. **Browse multiple pages / interact with buttons** (Features, Pricing, Book a Demo, submit the form).
-6. **Test from a different internet connection** — e.g. mobile data on a phone, or a
-   colleague on a different office network.
-7. **Check the Leadpipe dashboard** for detected visitors / company or contact info.
+4. **Click Accept** on the cookie banner — this is what injects VisiLead and calls
+   `visilead.consent()`. Because the tracker is consent-gated, it will **not** load for a
+   visit where nobody accepts.
+5. **Click "Verify"** in VisiLead → Settings. It should flip *Pending → Verified* once it
+   has seen that real page-load. If it stays Pending, revisit the site (accepting consent)
+   and verify again.
+6. **Browse multiple pages / interact with buttons** (Features, Pricing, Book a Demo, submit the form).
+7. **Test from a different internet connection** — e.g. mobile data on a phone, or a
+   colleague on a different office/corporate network.
+8. **Check the VisiLead dashboard** (Companies / Hot Leads) for detected visitors.
 
 ### Expect realistic results — not magic
-Leadpipe (and tools like it) **cannot identify every visitor**. Identification is
-best-effort and commonly returns **nothing** for:
+VisiLead (and every tool like it — Leadpipe, Warmly, etc.) **cannot identify every
+visitor**. Identification is best-effort and commonly returns **nothing** for:
 
 - **localhost** and preview traffic,
 - **VPN / proxy** traffic,
 - **personal / home / mobile IP** addresses (most consumer ISPs are not resolvable to a company),
 - visitors using **ad/tracker blockers** (the pixel may be blocked entirely),
-- **newly deployed domains** that Leadpipe hasn't finished verifying/warming up.
+- **newly deployed domains** that the provider hasn't finished verifying/warming up
+  (VisiLead shows this as *Pending* until it sees a real, consented page-load).
 
 The most reliable positive signal comes from someone browsing on a **corporate
 network** whose IP maps to an identifiable business. If you see no leads, that is a
 normal outcome for the conditions above — not necessarily a bug in this site.
 
-> This project never fabricates identification results. Trust only what the Leadpipe
+> This project never fabricates identification results. Trust only what the VisiLead
 > dashboard actually reports.

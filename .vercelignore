@@ -1,0 +1,14 @@
+# Only the static site files should be uploaded to Vercel.
+# Deployed: index.html, privacy.html, styles.css, script.js, vercel.json
+
+# ── Netlify-only (this project also has a Netlify setup) ──
+.netlify
+netlify.toml
+
+# ── VCS / tooling — never needed by the served site ──
+.git
+.gitignore
+.claude
+
+# ── Docs — not served as a page ──
+README.md

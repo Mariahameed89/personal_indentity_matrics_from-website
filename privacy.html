@@ -49,24 +49,33 @@
 
       <h2>1. What this site does</h2>
       <p>
-        This page loads a third-party analytics pixel provided by <strong>Leadpipe</strong>.
-        When enabled, Leadpipe attempts to identify the business/organization associated
-        with a visit (for example, based on network information). We use this only to test
-        whether the pixel functions.
+        With your consent, this page loads a third-party visitor-identification tool provided by
+        <strong>VisiLead</strong> (<code>visilead.co</code>). When enabled, VisiLead attempts to
+        identify the business/organization associated with a visit (for example, based on network
+        information). We use this only to test whether the tool functions. Other tools
+        (Leadpipe, Warmly.ai) may be tested the same way in future.
       </p>
 
       <h2>2. Consent comes first</h2>
       <p>
-        The Leadpipe pixel is <strong>not loaded</strong> until you click <strong>Accept</strong>
-        on the cookie banner. If you click <strong>Reject</strong>, the pixel is never loaded.
+        No visitor-identification tool is <strong>loaded at all</strong> until you click
+        <strong>Accept</strong> on the cookie banner — before that, your browser makes no
+        request to VisiLead whatsoever. If you click <strong>Reject</strong>, nothing is loaded.
         Your choice is stored in your browser's <code>localStorage</code> under the key
-        <code>pf_consent</code>. You can revoke it at any time using the
-        <strong>Reset consent</strong> button in the footer.
+        <code>pf_consent</code>.
+      </p>
+      <p>
+        VisiLead is additionally loaded in its <em>manual consent mode</em>, meaning it stores and
+        tracks nothing until we explicitly call <code>visilead.consent()</code> after you accept.
+        It also honours the browser's Global Privacy Control (GPC) opt-out signal automatically.
+        Using <strong>Reset consent</strong> in the footer calls
+        <code>visilead.revokeConsent()</code>, which stops tracking and deletes your visitor ID
+        from the browser.
       </p>
 
       <h2>3. What may be collected (when you accept)</h2>
       <ul>
-        <li>Standard request metadata such as IP address and user agent (by Leadpipe).</li>
+        <li>Standard request metadata such as IP address and user agent (by VisiLead).</li>
         <li>Pages viewed on this site and basic interaction events used for the test.</li>
         <li>Any details you voluntarily type into the demo contact form.</li>
       </ul>
@@ -77,16 +86,18 @@
 
       <h2>4. Third-party processing</h2>
       <p>
-        Leadpipe processes visit data on its own infrastructure under its own policies.
-        Review Leadpipe's documentation and privacy terms at
-        <a href="https://dashboard.leadpipe.com/dashboard/pixels" rel="noopener" target="_blank">their dashboard</a>
+        VisiLead processes visit data on its own infrastructure under its own policies.
+        Review VisiLead's documentation and privacy terms at
+        <a href="https://visilead.co" rel="noopener" target="_blank">visilead.co</a>
         for details on how identification works and how to exercise data rights.
+        The same applies to any other identification tool we test.
       </p>
 
       <h2>5. Cookies &amp; local storage</h2>
       <ul>
         <li><code>pf_consent</code> — your Accept/Reject choice (first-party, localStorage).</li>
-        <li>Any cookies set by the Leadpipe script itself, only after you accept.</li>
+        <li>A VisiLead visitor ID and any cookies its script sets — only after you accept.
+          These are deleted when you use <strong>Reset consent</strong>.</li>
       </ul>
 
       <h2>6. Your choices</h2>

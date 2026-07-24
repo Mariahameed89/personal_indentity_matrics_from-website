@@ -1,132 +1,198 @@
 /* ===========================================================
    PipelineFlow — demo site logic
-   - Cookie consent (Accept / Reject) stored in localStorage
-   - Leadpipe pixel injected ONLY after consent, ONLY once
-   - Contact form (no backend) with thank-you message
-   - Debug panel available at ?debug=true
+   Consent-gated visitor-identification trackers:
+     - VisiLead  (ACTIVE)   — native manual-consent mode
+     - Leadpipe  (DISABLED) — old pixel tied to a different domain
+     - Warmly    (PENDING)  — awaiting token
+   Nothing contacts any tracker until the visitor clicks "Accept".
+   Each tracker is injected at most once (no duplicate loading).
    =========================================================== */
 
 (function () {
   "use strict";
 
   /* -----------------------------------------------------------
-     CONFIG
-     -----------------------------------------------------------
-     The ONLY place you edit to swap in a new Leadpipe pixel.
-     Do NOT modify the script string itself — just the URL below.
-     Provided pixel:
-       <script src="https://leadpipe.aws53.cloud/p/c801e1ba-dfe5-4c5e-b34a-ce2c53bd990b.js" async></script>
-  */
-  var LEADPIPE_PIXEL_SRC =
-    "https://leadpipe.aws53.cloud/p/c801e1ba-dfe5-4c5e-b34a-ce2c53bd990b.js";
+     TRACKER CONFIG — the only place you edit to add/swap pixels.
+     ----------------------------------------------------------- */
+
+  // VisiLead — registered for websitetracking-five.vercel.app.
+  // Injected with data-consent="manual": it stores/tracks NOTHING
+  // until we call visilead.consent() (done only after Accept).
+  var VISILEAD = {
+    enabled: true,
+    src: "https://visilead.co/tracker.js",
+    id: "vl_a35bbeff8ef6"
+  };
+
+  // Leadpipe — DISABLED: this pixel is tied to a different expected
+  // domain and will NOT verify on this URL. To use it: generate a
+  // Leadpipe pixel for THIS domain, paste its src below, enabled:true.
+  var LEADPIPE = {
+    enabled: false,
+    src: "https://leadpipe.aws53.cloud/p/c801e1ba-dfe5-4c5e-b34a-ce2c53bd990b.js"
+  };
+
+  // Warmly.ai — PENDING: paste the snippet's src (and id if any) when
+  // it arrives, then set enabled: true. Loader stub is below.
+  var WARMLY = {
+    enabled: false,
+    src: "",   // e.g. "https://opps-widget.getwarmly.com/warmly.js?clientId=..."
+    id: ""
+  };
 
   var CONSENT_KEY = "pf_consent"; // "accepted" | "rejected"
-  var PIXEL_DOM_ID = "leadpipe-pixel";
 
-  // Simple query helpers
+  // Query helpers
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
   function $all(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
 
   /* ---------------- Consent state ---------------- */
-  function getConsent() {
-    try { return localStorage.getItem(CONSENT_KEY); }
-    catch (e) { return null; }
-  }
-  function setConsent(value) {
-    try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
-  }
-  function clearConsent() {
-    try { localStorage.removeItem(CONSENT_KEY); } catch (e) {}
-  }
+  function getConsent() { try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; } }
+  function setConsent(v) { try { localStorage.setItem(CONSENT_KEY, v); } catch (e) {} }
+  function clearConsent() { try { localStorage.removeItem(CONSENT_KEY); } catch (e) {} }
 
-  /* ---------------- Leadpipe pixel loader ----------------
-     Guaranteed to inject at most once (idempotent):
-       - in-memory flag
-       - checks the DOM for an existing element by id
+  /* ---------------- Tracker loaders ----------------
+     Idempotent: an in-memory flag + a DOM id check guarantee each
+     tracker is injected at most once (prevents duplicate loading).
   */
-  var pixelInjected = false;
+  var loaded = { visilead: false, leadpipe: false, warmly: false };
 
-  function isPixelLoaded() {
-    return pixelInjected || !!document.getElementById(PIXEL_DOM_ID);
+  function injectScript(opts) {
+    if (document.getElementById(opts.id)) return null;
+    var s = document.createElement("script");
+    s.id = opts.id;
+    s.src = opts.src;
+    if (opts.async) { s.async = true; } else { s.defer = true; }
+    if (opts.attrs) {
+      Object.keys(opts.attrs).forEach(function (k) { s.setAttribute(k, opts.attrs[k]); });
+    }
+    if (opts.onload) s.onload = opts.onload;
+    if (opts.onerror) s.onerror = opts.onerror;
+    (document.head || document.documentElement).appendChild(s);
+    return s;
   }
 
-  function loadLeadpipePixel() {
-    if (isPixelLoaded()) {
-      return false; // already loaded — do nothing (prevents duplicates)
+  /* --- VisiLead --- */
+  function callVisileadConsent(attempt) {
+    attempt = attempt || 0;
+    try {
+      if (window.visilead && typeof window.visilead.consent === "function") {
+        window.visilead.consent();
+        console.log("VisiLead pixel loaded — consent granted");
+        refreshDebug();
+        return;
+      }
+    } catch (e) { console.warn("[VisiLead] consent() error", e); return; }
+    // The global may initialise slightly after onload — retry briefly.
+    if (attempt < 20) {
+      setTimeout(function () { callVisileadConsent(attempt + 1); }, 150);
+    } else {
+      console.warn("[VisiLead] consent() API not available after load");
     }
-    pixelInjected = true;
+  }
 
-    var s = document.createElement("script");
-    s.id = PIXEL_DOM_ID;
-    s.src = LEADPIPE_PIXEL_SRC;
-    s.async = true;
-    s.setAttribute("data-leadpipe", "true");
-    s.onload = function () {
-      console.log("Leadpipe pixel loaded");
-      dbgLog("Pixel onload fired.");
-      refreshDebug();
-    };
-    s.onerror = function () {
-      console.warn("[Leadpipe] pixel failed to load (network/ad-blocker?)");
-      dbgLog("Pixel FAILED to load (blocked or network error).");
-      refreshDebug();
-    };
-    (document.head || document.documentElement).appendChild(s);
-
-    // Log immediately on injection as well (the requirement asks to log on Accept).
-    console.log("Leadpipe pixel loaded");
-    refreshDebug();
+  function loadVisiLead() {
+    if (!VISILEAD.enabled) return false;
+    if (loaded.visilead || document.getElementById("visilead-pixel")) return false;
+    loaded.visilead = true;
+    injectScript({
+      id: "visilead-pixel",
+      src: VISILEAD.src,
+      attrs: { "data-id": VISILEAD.id, "data-consent": "manual" },
+      onload: function () { callVisileadConsent(0); refreshDebug(); },
+      onerror: function () { console.warn("[VisiLead] failed to load (ad-blocker/network?)"); refreshDebug(); }
+    });
     return true;
   }
 
+  function revokeVisiLead() {
+    try {
+      if (window.visilead && typeof window.visilead.revokeConsent === "function") {
+        window.visilead.revokeConsent();
+        console.log("VisiLead consent revoked — visitor ID deleted from browser");
+      }
+    } catch (e) {}
+  }
+
+  /* --- Leadpipe (disabled until a domain-matched pixel is provided) --- */
+  function loadLeadpipe() {
+    if (!LEADPIPE.enabled) return false;
+    if (loaded.leadpipe || document.getElementById("leadpipe-pixel")) return false;
+    loaded.leadpipe = true;
+    injectScript({
+      id: "leadpipe-pixel",
+      src: LEADPIPE.src,
+      async: true,
+      attrs: { "data-leadpipe": "true" },
+      onload: function () { console.log("Leadpipe pixel loaded"); refreshDebug(); },
+      onerror: function () { console.warn("[Leadpipe] failed to load"); refreshDebug(); }
+    });
+    console.log("Leadpipe pixel loaded");
+    return true;
+  }
+
+  /* --- Warmly (stub; fill WARMLY config + enable when token arrives) --- */
+  function loadWarmly() {
+    if (!WARMLY.enabled || !WARMLY.src) return false;
+    if (loaded.warmly || document.getElementById("warmly-pixel")) return false;
+    loaded.warmly = true;
+    injectScript({
+      id: "warmly-pixel",
+      src: WARMLY.src,
+      attrs: WARMLY.id ? { "data-id": WARMLY.id } : null,
+      onload: function () { console.log("Warmly pixel loaded"); refreshDebug(); },
+      onerror: function () { console.warn("[Warmly] failed to load"); refreshDebug(); }
+    });
+    return true;
+  }
+
+  function loadAllTrackers() {
+    loadVisiLead();
+    loadLeadpipe();
+    loadWarmly();
+  }
+
+  function trackerStatusText() {
+    function state(cfg, isLoaded) { return cfg.enabled ? (isLoaded ? "yes" : "armed") : "off"; }
+    return "VisiLead: " + state(VISILEAD, loaded.visilead) +
+           " · Leadpipe: " + state(LEADPIPE, loaded.leadpipe) +
+           " · Warmly: " + state(WARMLY, loaded.warmly);
+  }
+
   /* ---------------- Custom event helper ----------------
-     Leadpipe does not publish a documented client-side custom-event
-     API at the time of writing. Rather than invent one, we probe a
-     few common integration shapes and fall back to a dataLayer-style
-     queue. This is safe and honest: if Leadpipe exposes an API, we
-     use it; otherwise the event is queued and logged.
+     Probes for a provider custom-event API; falls back to a
+     dataLayer-style queue. Never fabricates a successful send.
+     Only fires when consent === "accepted".
   */
-  function leadpipeTrack(eventName, payload) {
+  function trackEvent(eventName, payload) {
     payload = payload || {};
     if (getConsent() !== "accepted") {
-      console.info("[Leadpipe] event skipped (no consent):", eventName);
+      console.info("[track] skipped (no consent):", eventName);
       return "skipped-no-consent";
     }
     try {
-      var lp = window.leadpipe || window.Leadpipe || window.lp;
-      if (lp && typeof lp.track === "function") {
-        lp.track(eventName, payload);
-        return "sent:native";
-      }
-      if (lp && typeof lp.push === "function") {
-        lp.push({ event: eventName, data: payload });
-        return "sent:push";
-      }
-      if (Array.isArray(window.leadpipeQueue)) {
-        window.leadpipeQueue.push([eventName, payload]);
-        return "sent:queue";
+      var providers = [window.visilead, window.leadpipe, window.Leadpipe, window.warmly];
+      for (var i = 0; i < providers.length; i++) {
+        var p = providers[i];
+        if (p && typeof p.track === "function") { p.track(eventName, payload); return "sent:native"; }
       }
       // Fallback queue a pixel could read later.
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: "leadpipe_" + eventName, data: payload });
-      console.info("[Leadpipe] No native custom-event API detected — queued:", eventName, payload);
+      window.dataLayer.push({ event: "pf_" + eventName, data: payload });
+      console.info("[track] no native custom-event API detected — queued:", eventName, payload);
       return "queued:dataLayer";
-    } catch (e) {
-      console.warn("[Leadpipe] event error", e);
-      return "error";
-    }
+    } catch (e) { console.warn("[track] error", e); return "error"; }
   }
 
   /* ---------------- Cookie banner ---------------- */
   var banner = $("#cookieBanner");
-
   function showBanner() { if (banner) banner.hidden = false; }
   function hideBanner() { if (banner) banner.hidden = true; }
 
   function onAccept() {
     setConsent("accepted");
     hideBanner();
-    loadLeadpipePixel();          // dynamic load after consent
+    loadAllTrackers();       // dynamic load only after consent
     updateFooterConsent();
     refreshDebug();
   }
@@ -134,7 +200,8 @@
   function onReject() {
     setConsent("rejected");
     hideBanner();
-    console.log("Leadpipe tracking rejected");
+    revokeVisiLead();        // no-op if not loaded; ensures nothing lingers
+    console.log("Tracking rejected — no visitor-identification pixel loaded");
     updateFooterConsent();
     refreshDebug();
   }
@@ -142,8 +209,8 @@
   function initConsent() {
     var consent = getConsent();
     if (consent === "accepted") {
-      // Returning visitor who already accepted — load without showing banner.
-      loadLeadpipePixel();
+      // Returning visitor who already accepted — load without the banner.
+      loadAllTrackers();
       hideBanner();
     } else if (consent === "rejected") {
       hideBanner();
@@ -160,11 +227,11 @@
     var resetBtn = $("#resetConsent");
     if (resetBtn) {
       resetBtn.addEventListener("click", function () {
+        revokeVisiLead();     // delete VisiLead's visitor ID before clearing
         clearConsent();
-        // Note: an already-injected pixel cannot be "unloaded" without a reload.
         updateFooterConsent();
         refreshDebug();
-        location.reload();
+        location.reload();    // reload so trackers start fresh on next choice
       });
     }
   }
@@ -202,8 +269,8 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      // Fire a Leadpipe custom "lead" event (only sends if consent === accepted).
-      var result = leadpipeTrack("lead_submitted", {
+      // Fire a custom "lead" event (only sends if consent === accepted).
+      var result = trackEvent("lead_submitted", {
         name: name, email: email, company: company, page: location.pathname
       });
       console.log("[PipelineFlow] demo form submitted →", result);
@@ -228,7 +295,6 @@
   function initDemoCtas() {
     $all("[data-demo-cta]").forEach(function (a) {
       a.addEventListener("click", function () {
-        // Let the anchor scroll to #contact, then focus the first field.
         setTimeout(function () {
           var first = $("#name");
           if (first) first.focus({ preventScroll: true });
@@ -272,7 +338,7 @@
     if (!debugOn) return;
     setText("#dbgUrl", location.href);
     setText("#dbgConsent", getConsent() || "not set");
-    setText("#dbgPixel", isPixelLoaded() ? "yes" : "no");
+    setText("#dbgPixel", trackerStatusText());
     setText("#dbgTime", nowStamp());
     setText("#dbgUa", navigator.userAgent);
     setText("#dbgRef", document.referrer || "(none)");
@@ -288,24 +354,24 @@
     if (!debugOn || !panel) return;
     panel.hidden = false;
     refreshDebug();
-    // Keep the timestamp fresh.
     setInterval(function () { setText("#dbgTime", nowStamp()); }, 1000);
 
     $("#debugClose").addEventListener("click", function () { panel.hidden = true; });
 
     $("#dbgPageView").addEventListener("click", function () {
-      var r = leadpipeTrack("page_view", { page: location.pathname, ts: nowStamp() });
+      var r = trackEvent("page_view", { page: location.pathname, ts: nowStamp() });
       dbgLog("page_view → " + r);
       refreshDebug();
     });
 
     $("#dbgLead").addEventListener("click", function () {
-      var r = leadpipeTrack("lead", { source: "debug-panel", ts: nowStamp() });
+      var r = trackEvent("lead", { source: "debug-panel", ts: nowStamp() });
       dbgLog("lead → " + r);
       refreshDebug();
     });
 
     $("#dbgClear").addEventListener("click", function () {
+      revokeVisiLead();
       clearConsent();
       dbgLog("Consent cleared — reloading…");
       location.reload();
